@@ -3,16 +3,6 @@ import 'package:splashscreen/splashscreen.dart';
 
 import 'main.dart';
 
-
-void main(){
-
-  runApp(new MaterialApp(
-    theme: new ThemeData.light(),
-    home: new Splash(),
-  ));
-
-}
-
 class Splash extends StatefulWidget {
   @override
   _SplashState createState() => _SplashState();

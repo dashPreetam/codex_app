@@ -57,8 +57,6 @@ class _AdminsState extends State<Admins> {
     );
   }
   
-  String id = "18ZZ";
-  
 
   void _showAlert(String name, String path, String git, String cont) {
 

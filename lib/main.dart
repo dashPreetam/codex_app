@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'Admins.dart';
 import 'Chat.dart';
+import 'SignIn.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,25 +50,28 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: value ? ThemeData.dark() : ThemeData.light(),
       home: DefaultTabController(
-          length: 3,
+          length: 2,
           child: Scaffold(
-              appBar: new AppBar(
-            title: new Text("Codex"),
-            actions: <Widget>[
-              IconButton(
-                  icon: img,
-                  onPressed: () {
-                    changeOnOff();
-                  })
-            ],
-            bottom: TabBar(
-              tabs: <Widget>[Tab(text: "Admins"), Tab(text: "Chat")],
+            appBar: new AppBar(
+              title: new Text("Codex"),
+              actions: <Widget>[
+                IconButton(
+                    icon: img,
+                    onPressed: () {
+                      changeOnOff();
+                    })
+              ],
+              bottom: TabBar(
+                tabs: <Widget>[
+                  Tab(text: "Admins"),
+                  Tab(text: "Chat"),
+                ],
+              ),
             ),
-          ),
-                  body: TabBarView(children: [
-                    Admins(),
-                    Chat()
-              ]),
+            body: TabBarView(children: [
+              Admins(),
+              Chat(),
+            ]),
           )),
     );
   }
