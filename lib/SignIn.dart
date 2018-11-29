@@ -3,17 +3,14 @@ import 'package:flutter/services.dart';
 
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'Splash.dart';
 
-void main(){
-
+void main() {
   runApp(new MaterialApp(
     home: SignIn(),
   ));
-
 }
 
 class SignIn extends StatefulWidget {
@@ -22,7 +19,6 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-
   TextEditingController controller = new TextEditingController();
 
   String code;
@@ -31,21 +27,18 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
-      appBar: new AppBar(title: new Text("App"),),
       body: Container(
         child: new Center(
           child: new FutureBuilder<FirebaseUser>(
             future: FirebaseAuth.instance.currentUser(),
             builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                if(snapshot.hasData)
-                  return new Text("Something"+snapshot.data.toString());
+                if (snapshot.hasData)
+                  return Splash();
                 else
                   return fields();
-              }
-              else {
+              } else {
                 return new Text('Loading...');
               }
             },
@@ -53,90 +46,72 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
-
   }
 
-  Widget fields(){
-
+  Widget fields() {
     return new Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           new TextField(
             decoration: InputDecoration(hintText: "Phone :"),
-            onChanged: (val){
+            onChanged: (val) {
               this.Phone = val;
             },
           ),
-          new RaisedButton(onPressed: verify,child: new Text("Verify"),),
-          new Divider(height: 50.0,),
-          new TextField(
-            decoration: InputDecoration(hintText: "OTP :"),
-            controller: controller,
-            onChanged: (val){
-              this.Phone = val;
-            },
+          new RaisedButton(
+            onPressed: verify,
+            child: new Text("Verify"),
           ),
-          new RaisedButton(onPressed: setOTP,child: new Text("check"),),
+          new Divider(
+            height: 50.0,
+          ),
         ],
       ),
     );
-
   }
 
   Future<void> verify() async {
+    AlertDialog alert = new AlertDialog(
+        shape: RoundedRectangleBorder(),
+        title: Text("Please wait while we verify and login."),
+        content: CircularProgressIndicator(value: 1.0));
 
-    print("Phone:"+Phone);
+    showDialog(context: context, builder: (BuildContext context) => alert);
 
-    PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String id){
+    PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String id) {
       this.vId = id;
     };
 
-    PhoneCodeSent codeSent = (String id,[int forceCodeResend]){
+    PhoneCodeSent codeSent = (String id, [int forceCodeResend]) {
       this.vId = id;
     };
 
-    PhoneVerificationCompleted phoneVerificationCompleted = (FirebaseUser user){
-      print(user);
+    PhoneVerificationCompleted phoneVerificationCompleted =
+        (FirebaseUser user) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Splash()),
+      );
     };
 
-    PhoneVerificationFailed phoneVerificationFailed = (Exception e){
+    PhoneVerificationFailed phoneVerificationFailed = (Exception e) {
       print(e);
     };
 
-
     await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: "+91"+Phone,
+        phoneNumber: "+91" + Phone,
         timeout: Duration(seconds: 10),
-        verificationCompleted: null,
+        verificationCompleted: phoneVerificationCompleted,
         verificationFailed: null,
         codeSent: codeSent,
-        codeAutoRetrievalTimeout: autoRetrievalTimeout
-    );
-    
-
-    
+        codeAutoRetrievalTimeout: autoRetrievalTimeout);
   }
-  
-  
+
   @override
   void initState() {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.initState();
-  }
-
-
-
-
-
-  void setOTP() {
-
-    String otp = controller.text;
-
-    setState(() {
-
-      vId = otp;
-
-    });
-
   }
 }
