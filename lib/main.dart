@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Admins.dart';
 import 'Chat.dart';
+import 'Pinned.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -19,6 +20,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     getAllowsNotifications().then(setName);
     super.initState();
+    setState(() {
+      img = Image.asset("images/lightOn.png");
+    });
   }
 
   Future<bool> changeOnOff() async {
@@ -46,7 +50,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: value ? ThemeData.dark() : ThemeData.light(),
       home: DefaultTabController(
-          length: 2,
+          length: 3,
           child: Scaffold(
             appBar: new AppBar(
               title: new Text("Codex"),
@@ -59,14 +63,16 @@ class _MyAppState extends State<MyApp> {
               ],
               bottom: TabBar(
                 tabs: <Widget>[
-                  Tab(text: "Admins"),
                   Tab(text: "Chat"),
+                  Tab(text: "Pinned"),
+                  Tab(text: "Admins"),
                 ],
               ),
             ),
             body: TabBarView(children: [
-              Admins(),
               Chat(),
+              Pinned(),
+              Admins(),
             ]),
           )),
     );

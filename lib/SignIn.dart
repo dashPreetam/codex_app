@@ -134,6 +134,8 @@ class _SignInState extends State<SignIn> {
 
       PhoneVerificationFailed phoneVerificationFailed = (Exception e) {
 
+        Navigator.pop(context);
+
         AlertDialog alert = new AlertDialog(
             shape: RoundedRectangleBorder(),
             title: Text("Verification Failed"),
@@ -145,9 +147,9 @@ class _SignInState extends State<SignIn> {
 
       await FirebaseAuth.instance.verifyPhoneNumber(
           phoneNumber: "+91" + Phone,
-          timeout: Duration(seconds: 10),
+          timeout: Duration(seconds: 60),
           verificationCompleted: phoneVerificationCompleted,
-          verificationFailed: null,
+          verificationFailed: phoneVerificationFailed,
           codeSent: codeSent,
           codeAutoRetrievalTimeout: autoRetrievalTimeout);
     } else {
