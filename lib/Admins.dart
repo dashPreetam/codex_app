@@ -8,21 +8,19 @@ class Admins extends StatefulWidget {
 }
 
 class _AdminsState extends State<Admins> {
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
       body: Container(
         child: new StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance.collection('Admins').snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             print(snapshot.toString());
             if (!snapshot.hasData) return new Text('Loading...');
             return new ListView(
-              children: snapshot.data.documents.map((DocumentSnapshot document) {
+              children:
+                  snapshot.data.documents.map((DocumentSnapshot document) {
                 return new FlatButton(
                     padding: new EdgeInsets.only(bottom: 20.0),
                     onPressed: () {
@@ -42,7 +40,8 @@ class _AdminsState extends State<Admins> {
                               child: new Text(
                                 "    " + document['Name'],
                                 style: new TextStyle(
-                                    fontSize: 40.0, fontStyle: FontStyle.italic),
+                                    fontSize: 40.0,
+                                    fontStyle: FontStyle.italic),
                               ),
                             ),
                           ],
@@ -56,11 +55,8 @@ class _AdminsState extends State<Admins> {
       ),
     );
   }
-  
 
   void _showAlert(String name, String path, String git, String cont) {
-
-
     AlertDialog dialog = new AlertDialog(
       title: new Center(
         child: new Text(
@@ -82,12 +78,15 @@ class _AdminsState extends State<Admins> {
                     new Text(
                       "GitHub :",
                       style: new TextStyle(
-                        fontSize: 20.0,
+                          fontSize: 20.0,
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.bold),
                     ),
-                    new Text(git,style: new TextStyle(fontSize: 20.0,
-                        fontStyle: FontStyle.italic,)),
+                    new Text(git,
+                        style: new TextStyle(
+                          fontSize: 20.0,
+                          fontStyle: FontStyle.italic,
+                        )),
                   ],
                 ),
               ),
@@ -103,8 +102,13 @@ class _AdminsState extends State<Admins> {
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.bold),
                     ),
-                    new Text(cont,style: new TextStyle(fontSize: 20.0,
-                        fontStyle: FontStyle.italic,),),
+                    new Text(
+                      cont,
+                      style: new TextStyle(
+                        fontSize: 20.0,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
                   ],
                 ),
               )

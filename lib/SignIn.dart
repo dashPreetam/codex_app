@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'Splash.dart';
+import 'main.dart';
 
 void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   runApp(new MaterialApp(
     home: SignIn(),
   ));
@@ -22,7 +22,8 @@ class _SignInState extends State<SignIn> {
   TextEditingController controller = new TextEditingController();
 
   String code;
-  String Phone;
+  String Phone = "";
+  String Name = "";
   String vId;
 
   @override
@@ -32,10 +33,11 @@ class _SignInState extends State<SignIn> {
         child: new Center(
           child: new FutureBuilder<FirebaseUser>(
             future: FirebaseAuth.instance.currentUser(),
-            builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasData)
-                  return Splash();
+                  return MyApp();
                 else
                   return fields();
               } else {
@@ -49,64 +51,106 @@ class _SignInState extends State<SignIn> {
   }
 
   Widget fields() {
-    return new Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new TextField(
-            decoration: InputDecoration(hintText: "Phone :"),
-            onChanged: (val) {
-              this.Phone = val;
-            },
-          ),
-          new RaisedButton(
-            onPressed: verify,
-            child: new Text("Verify"),
-          ),
-          new Divider(
-            height: 50.0,
-          ),
-        ],
-      ),
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        new Image(
+          image: AssetImage("images/Wallpaper.jpg"),
+          fit: BoxFit.cover,
+          color: Colors.brown[900],
+          colorBlendMode: BlendMode.darken,
+        ),
+        new Theme(
+            data: new ThemeData(
+              brightness: Brightness.dark,
+            ),
+            child: AspectRatio(
+                aspectRatio: 100 / 100,
+                child: new ListView(shrinkWrap: true, children: <Widget>[
+                  Container(
+                    padding:
+                        EdgeInsets.only(left: 20.0, right: 20.0, top: 50.0),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Image(image: AssetImage("images/launcher.png")),
+                          new TextField(
+                            decoration: InputDecoration(hintText: "Phone :"),
+                            onChanged: (val) {
+                              this.Phone = val;
+                            },
+                          ),
+                          new TextField(
+                            decoration: InputDecoration(hintText: "Name :"),
+                            onChanged: (val) {
+                              this.Name = val;
+                            },
+                          ),
+                          new Container(
+                            padding: EdgeInsets.only(top: 20.0),
+                            child: RaisedButton(
+                              splashColor: Colors.cyan,
+                              onPressed: verify,
+                              child: new Text("Verify"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ])))
+      ],
     );
   }
 
   Future<void> verify() async {
-    AlertDialog alert = new AlertDialog(
-        shape: RoundedRectangleBorder(),
-        title: Text("Please wait while we verify and login."),
-        content: CircularProgressIndicator(value: 1.0));
+    if (Phone != "" && Name != "") {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("UserName", Name);
+      prefs.setString("UserPhone", Phone);
 
-    showDialog(context: context, builder: (BuildContext context) => alert);
+      AlertDialog alert = new AlertDialog(
+          shape: RoundedRectangleBorder(),
+          title: Text("Please wait while we verify and login."),
+          content: CircularProgressIndicator(value: 1.0));
 
-    PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String id) {
-      this.vId = id;
-    };
+      showDialog(context: context, builder: (BuildContext context) => alert);
 
-    PhoneCodeSent codeSent = (String id, [int forceCodeResend]) {
-      this.vId = id;
-    };
+      PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String id) {
+        this.vId = id;
+      };
 
-    PhoneVerificationCompleted phoneVerificationCompleted =
-        (FirebaseUser user) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Splash()),
-      );
-    };
+      PhoneCodeSent codeSent = (String id, [int forceCodeResend]) {
+        this.vId = id;
+      };
 
-    PhoneVerificationFailed phoneVerificationFailed = (Exception e) {
-      print(e);
-    };
+      PhoneVerificationCompleted phoneVerificationCompleted =
+          (FirebaseUser user) {
+        Navigator.of(context).pushReplacement(
+            new MaterialPageRoute(builder: (BuildContext context) => MyApp()));
+      };
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: "+91" + Phone,
-        timeout: Duration(seconds: 10),
-        verificationCompleted: phoneVerificationCompleted,
-        verificationFailed: null,
-        codeSent: codeSent,
-        codeAutoRetrievalTimeout: autoRetrievalTimeout);
+      PhoneVerificationFailed phoneVerificationFailed = (Exception e) {
+        print(e);
+      };
+
+      await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: "+91" + Phone,
+          timeout: Duration(seconds: 10),
+          verificationCompleted: phoneVerificationCompleted,
+          verificationFailed: null,
+          codeSent: codeSent,
+          codeAutoRetrievalTimeout: autoRetrievalTimeout);
+    } else {
+      AlertDialog alert = new AlertDialog(
+          shape: RoundedRectangleBorder(),
+          title: Text("Fields cannot be blank."),
+          content: CircularProgressIndicator(value: 1.0));
+
+      showDialog(context: context, builder: (BuildContext context) => alert);
+    }
   }
 
   @override
