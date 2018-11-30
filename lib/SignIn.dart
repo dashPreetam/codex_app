@@ -114,7 +114,7 @@ class _SignInState extends State<SignIn> {
       AlertDialog alert = new AlertDialog(
           shape: RoundedRectangleBorder(),
           title: Text("Please wait while we verify and login."),
-          content: CircularProgressIndicator(value: 1.0));
+          content: CircularProgressIndicator());
 
       showDialog(context: context, builder: (BuildContext context) => alert);
 
@@ -133,7 +133,14 @@ class _SignInState extends State<SignIn> {
       };
 
       PhoneVerificationFailed phoneVerificationFailed = (Exception e) {
-        print(e);
+
+        AlertDialog alert = new AlertDialog(
+            shape: RoundedRectangleBorder(),
+            title: Text("Verification Failed"),
+            content: Text(e.toString())
+        );
+
+        showDialog(context: context, builder: (BuildContext context) => alert);
       };
 
       await FirebaseAuth.instance.verifyPhoneNumber(
@@ -146,8 +153,9 @@ class _SignInState extends State<SignIn> {
     } else {
       AlertDialog alert = new AlertDialog(
           shape: RoundedRectangleBorder(),
-          title: Text("Fields cannot be blank."),
-          content: CircularProgressIndicator(value: 1.0));
+          title: Text("Following fields cannot be blank."),
+          content: Text("Phone \nName")
+      );
 
       showDialog(context: context, builder: (BuildContext context) => alert);
     }
